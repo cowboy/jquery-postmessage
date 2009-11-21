@@ -39,5 +39,5 @@ Internet Explorer 6-8, Firefox 3, Safari 3-4, Chrome, Opera 9.
 
 ## License ##
 Copyright (c) 2009 "Cowboy" Ben Alman  
-Licensed under the MIT license  
+Dual licensed under the MIT and GPL licenses.  
 [http://benalman.com/about/license/](http://benalman.com/about/license/)

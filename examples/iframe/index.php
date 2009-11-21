@@ -99,6 +99,7 @@ ob_end_clean();
 
 ob_start();
 ?>
+<?= $shell['donate'] ?>
 
 <p>
   Note that both parent and child need to include the <a href="http://benalman.com/projects/jquery-postmessage-plugin/">jQuery postMessage</a> javascript, and for communication to be enabled in browsers that don't support window.postMessage, the child page must know the exact parent URL (in this example, that is done by passing the parent location into the Iframe using a hash param in the Iframe src attribute).
@@ -106,7 +107,7 @@ ob_start();
 
 <p id="nav"></p>
 
-<div id="iframe"></div>
+<div id="iframe" class="clear"></div>
 
 <h3>The parent window code</h3>
 

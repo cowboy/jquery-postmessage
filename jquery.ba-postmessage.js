@@ -1,9 +1,9 @@
 /*!
  * jQuery postMessage - v0.5 - 9/11/2009
- * http://benalman.com/
+ * http://benalman.com/projects/jquery-postmessage-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
- * Licensed under the MIT license
+ * Dual licensed under the MIT and GPL licenses.
  * http://benalman.com/about/license/
  */
 
@@ -19,7 +19,7 @@
 // About: License
 // 
 // Copyright (c) 2009 "Cowboy" Ben Alman,
-// Licensed under the MIT license.
+// Dual licensed under the MIT and GPL licenses.
 // http://benalman.com/about/license/
 // 
 // About: Examples
