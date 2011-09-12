@@ -179,10 +179,10 @@
         // unbinding.
         rm_callback = function(e) {
           // Opera <10 uses event.domain and doesn't include the http:// prefix
-        	if(e.domain) {
-      			source_origin = source_origin.split("://")[1];
-      			e.origin = e.domain;
-    		  }
+          if(e.domain) {
+            source_origin = source_origin.split("://")[1];
+            e.origin = e.domain;
+          }
           
           if ( ( typeof source_origin === 'string' && e.origin !== source_origin )
             || ( $.isFunction( source_origin ) && source_origin( e.origin ) === FALSE ) ) {
