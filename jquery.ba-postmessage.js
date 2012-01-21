@@ -145,7 +145,7 @@
   // 
   // Usage:
   // 
-  // > jQuery.receiveMessage( callback [, source_origin ] [, delay ] );
+  // > jQuery.receiveMessage( callback [, source_origin ] [, delay ] [, target_window ] );
   // 
   // Arguments:
   // 
@@ -167,7 +167,16 @@
   // 
   //  Nothing!
   
-  $.receiveMessage = p_receiveMessage = function( callback, source_origin, delay ) {
+  $.receiveMessage = p_receiveMessage = function( callback, source_origin, delay, target_window ) {
+
+    target_window = source_origin && $.isWindow(source_origin)
+      ? source_origin
+      : delay && $.isWindow(delay)
+        ? delay
+        : target_window && $.isWindow(target_window)
+          ? target_window
+          : window;
+
     if ( has_postMessage ) {
       // Since the browser supports window.postMessage, the callback will be
       // bound to the actual event associated with window.postMessage.
@@ -187,10 +196,10 @@
         };
       }
       
-      if ( window[addEventListener] ) {
-        window[ callback ? addEventListener : 'removeEventListener' ]( 'message', rm_callback, FALSE );
+      if ( target_window[addEventListener] ) {
+        target_window[ callback ? addEventListener : 'removeEventListener' ]( 'message', rm_callback, FALSE );
       } else {
-        window[ callback ? 'attachEvent' : 'detachEvent' ]( 'onmessage', rm_callback );
+        target_window[ callback ? 'attachEvent' : 'detachEvent' ]( 'onmessage', rm_callback );
       }
       
     } else {
@@ -208,7 +217,7 @@
             : 100;
         
         interval_id = setInterval(function(){
-          var hash = document.location.hash,
+          var hash = target_window.document.location.hash,
             re = /^#?\d+&/;
           if ( hash !== last_hash && re.test( hash ) ) {
             last_hash = hash;
