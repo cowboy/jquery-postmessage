@@ -54,7 +54,7 @@
     rm_callback,
     
     // A few convenient shortcuts.
-    window = this,
+    window = window, // create local copy
     FALSE = !1,
     
     // Reused internal strings.
