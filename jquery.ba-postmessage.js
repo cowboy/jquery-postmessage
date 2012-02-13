@@ -48,6 +48,7 @@
   // A few vars used in non-awesome browsers.
   var interval_id,
     last_hash,
+    hash_store,
     cache_bust = 1,
     
     // A var used in awesome browsers.
@@ -64,7 +65,7 @@
     p_receiveMessage,
     
     // I couldn't get window.postMessage to actually work in Opera 9.64!
-    has_postMessage = window[postMessage] && !$.browser.opera;
+    has_postMessage = false && window[postMessage] && !$.browser.opera;
   
   // Method: jQuery.postMessage
   // 
@@ -115,8 +116,20 @@
       // The browser does not support window.postMessage, so set the location
       // of the target to target_url#message. A bit ugly, but it works! A cache
       // bust parameter is added to ensure that repeat messages trigger the
-      // callback.
-      target.location = target_url.replace( /#.*$/, '' ) + '#' + (+new Date) + (cache_bust++) + '&' + message;
+      // callback. If the hash is too long (> 1000 chars), we signal a chaining and send the next part after a delay
+      var sendMessage = function (message) {
+            target.location = target_url.replace( /#.*$/, '' ) + '#' + (+new Date) + (cache_bust++) + '&' + message;
+          },
+          part_delay = 0,
+          message_parts;
+      // We must limit the length of hashes for non-awesome browsers
+      message = message.match(/.{1,1000}/g);
+      for (var i = 0, part; part = message[i++];) {
+        setTimeout((function (part, i, message) {
+          sendMessage(part + '&;;pm_part=' + i + ',' + message.length);
+        })(part, i, message), part_delay);
+        part_delay += 200;
+      }
     }
   };
   
@@ -216,12 +229,18 @@
             ? delay
             : 100;
         
-        interval_id = setInterval(function(){
+        interval_id = setInterval(function () {
           var hash = target_window.document.location.hash,
-            re = /^#?\d+&/;
+              re = /^#?\d+&/;
           if ( hash !== last_hash && re.test( hash ) ) {
             last_hash = hash;
-            callback({ data: hash.replace( re, '' ) });
+            // Check if we are sending a long message across multiple hash changes
+            var hash_part = hash.match(/(.*)&;;pm_part=(\d+),(\d+)/);
+            hash_store += hash_part[1].replace( re, '' );
+            if ( hash_part[2] === hash_part[3] ) {
+              callback({ data: hash_store });
+              hash_store = '';
+            }
           }
         }, delay );
       }
