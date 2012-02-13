@@ -65,7 +65,7 @@
     p_receiveMessage,
     
     // I couldn't get window.postMessage to actually work in Opera 9.64!
-    has_postMessage = false && window[postMessage] && !$.browser.opera;
+    has_postMessage = window[postMessage] && !$.browser.opera;
   
   // Method: jQuery.postMessage
   // 
