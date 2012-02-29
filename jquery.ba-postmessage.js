@@ -48,6 +48,7 @@
   // A few vars used in non-awesome browsers.
   var interval_id,
     last_hash,
+    hash_store,
     cache_bust = 1,
     
     // A var used in awesome browsers.
@@ -115,8 +116,18 @@
       // The browser does not support window.postMessage, so set the location
       // of the target to target_url#message. A bit ugly, but it works! A cache
       // bust parameter is added to ensure that repeat messages trigger the
-      // callback.
-      target.location = target_url.replace( /#.*$/, '' ) + '#' + (+new Date) + (cache_bust++) + '&' + message;
+      // callback. If the hash is too long (> 1000 chars), we signal a chaining and send the next part after a delay
+      var sendMessage = function (message) {
+            target.location = target_url.replace( /#.*$/, '' ) + '#' + (+new Date) + (cache_bust++) + '&' + message;
+          },
+          part_delay = 0,
+          message_parts;
+      // We must limit the length of hashes for non-awesome browsers
+      message = message.match(/.{1,1000}/g);
+      for (var i = 0; i < message.length; i++) {
+        setTimeout(function () { sendMessage(message[i-1] + '&;;pm_part=' + i + ',' + message.length) }, part_delay);
+        part_delay += 200;
+      }
     }
   };
   
@@ -145,7 +156,7 @@
   // 
   // Usage:
   // 
-  // > jQuery.receiveMessage( callback [, source_origin ] [, delay ] );
+  // > jQuery.receiveMessage( callback [, source_origin ] [, delay ] [, target_window ] );
   // 
   // Arguments:
   // 
@@ -167,7 +178,16 @@
   // 
   //  Nothing!
   
-  $.receiveMessage = p_receiveMessage = function( callback, source_origin, delay ) {
+  $.receiveMessage = p_receiveMessage = function( callback, source_origin, delay, target_window ) {
+
+    target_window = source_origin && $.isWindow(source_origin)
+      ? source_origin
+      : delay && $.isWindow(delay)
+        ? delay
+        : target_window && $.isWindow(target_window)
+          ? target_window
+          : window;
+
     if ( has_postMessage ) {
       // Since the browser supports window.postMessage, the callback will be
       // bound to the actual event associated with window.postMessage.
@@ -187,10 +207,10 @@
         };
       }
       
-      if ( window[addEventListener] ) {
-        window[ callback ? addEventListener : 'removeEventListener' ]( 'message', rm_callback, FALSE );
+      if ( target_window[addEventListener] ) {
+        target_window[ callback ? addEventListener : 'removeEventListener' ]( 'message', rm_callback, FALSE );
       } else {
-        window[ callback ? 'attachEvent' : 'detachEvent' ]( 'onmessage', rm_callback );
+        target_window[ callback ? 'attachEvent' : 'detachEvent' ]( 'onmessage', rm_callback );
       }
       
     } else {
@@ -207,12 +227,18 @@
             ? delay
             : 100;
         
-        interval_id = setInterval(function(){
-          var hash = document.location.hash,
-            re = /^#?\d+&/;
+        interval_id = setInterval(function () {
+          var hash = target_window.document.location.hash,
+              re = /^#?\d+&/;
           if ( hash !== last_hash && re.test( hash ) ) {
             last_hash = hash;
-            callback({ data: hash.replace( re, '' ) });
+            // Check if we are sending a long message across multiple hash changes
+            var hash_part = hash.match(/(.*)&;;pm_part=(\d+),(\d+)/);
+            hash_store += hash_part[1].replace( re, '' );
+            if ( hash_part[2] === hash_part[3] ) {
+              callback({ data: hash_store });
+              hash_store = '';
+            }
           }
         }, delay );
       }
