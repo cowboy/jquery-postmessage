@@ -124,10 +124,8 @@
           message_parts;
       // We must limit the length of hashes for non-awesome browsers
       message = message.match(/.{1,1000}/g);
-      for (var i = 0, part; part = message[i++];) {
-        setTimeout((function (part, i, message) {
-          sendMessage(part + '&;;pm_part=' + i + ',' + message.length);
-        })(part, i, message), part_delay);
+      for (var i = 0; i < message.length; i++) {
+        setTimeout(function () { sendMessage(message[i-1] + '&;;pm_part=' + i + ',' + message.length) }, part_delay);
         part_delay += 200;
       }
     }
