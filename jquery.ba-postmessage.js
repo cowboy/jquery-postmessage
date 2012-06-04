@@ -63,8 +63,7 @@
     
     p_receiveMessage,
     
-    // I couldn't get window.postMessage to actually work in Opera 9.64!
-    has_postMessage = window[postMessage] && !$.browser.opera;
+    has_postMessage = window[postMessage];
   
   // Method: jQuery.postMessage
   // 
@@ -179,6 +178,12 @@
         // Bind the callback. A reference to the callback is stored for ease of
         // unbinding.
         rm_callback = function(e) {
+          // Opera <10 uses event.domain and doesn't include the http:// prefix
+          if(e.domain) {
+            source_origin = source_origin.split("://")[1];
+            e.origin = e.domain;
+          }
+          
           if ( ( typeof source_origin === 'string' && e.origin !== source_origin )
             || ( $.isFunction( source_origin ) && source_origin( e.origin ) === FALSE ) ) {
             return FALSE;
