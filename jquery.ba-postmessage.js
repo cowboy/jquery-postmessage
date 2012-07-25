@@ -109,8 +109,9 @@
     if ( has_postMessage ) {
       // The browser supports window.postMessage, so call it with a targetOrigin
       // set appropriately, based on the target_url parameter.
-      target[postMessage]( message, target_url.replace( /([^:]+:\/\/[^\/]+).*/, '$1' ) );
-      
+      window.setTimeout(function() {
+        target[postMessage]( message, target_url.replace( /([^:]+:\/\/[^\/]+).*/, '$1' ) );
+      }, 0);
     } else if ( target_url ) {
       // The browser does not support window.postMessage, so set the location
       // of the target to target_url#message. A bit ugly, but it works! A cache
