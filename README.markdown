@@ -26,7 +26,11 @@ Information about what version or versions of jQuery this plugin has been
 tested with and what browsers it has been tested in.
 
 ### jQuery Versions ###
-1.3.2
+1.3.2+
+
+For jQuery 1.9.2+ you also need the jQuery.browser plugin.
+
+[https://github.com/gabceb/jquery-browser-plugin](https://github.com/gabceb/jquery-browser-plugin)
 
 ### Browsers Tested ###
 Internet Explorer 6-8, Firefox 3, Safari 3-4, Chrome, Opera 9.
